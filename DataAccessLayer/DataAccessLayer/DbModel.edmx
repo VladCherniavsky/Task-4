@@ -4,27 +4,117 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Namespace="DbModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005">
-        <EntityContainer Name="DbModelTargetContainer" >
-        </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+    <Schema Namespace="DbModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="DbModelStoreContainer">
+    <EntitySet Name="ManagerSet" EntityType="DbModel.Store.ManagerSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="InfoSet" EntityType="DbModel.Store.InfoSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="ManagerInfo" Association="DbModel.Store.ManagerInfo">
+      <End Role="Manager" EntitySet="ManagerSet" />
+      <End Role="Info" EntitySet="InfoSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="ManagerSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ManagerName" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="InfoSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="ClientName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Item" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Sum" Type="int" Nullable="false" />
+    <Property Name="ManagerId" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="ManagerInfo">
+    <End Role="Manager" Type="DbModel.Store.ManagerSet" Multiplicity="1" />
+    <End Role="Info" Type="DbModel.Store.InfoSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Manager">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Info">
+        <PropertyRef Name="ManagerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="DbModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
         <EntityContainer Name="DbModelContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ManagerSet" EntityType="DbModel.Manager" />
+          <EntitySet Name="InfoSet" EntityType="DbModel.Info" />
+          <AssociationSet Name="ManagerInfo" Association="DbModel.ManagerInfo">
+            <End Role="Manager" EntitySet="ManagerSet" />
+            <End Role="Info" EntitySet="InfoSet" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Manager">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ManagerName" Type="String" Nullable="false" />
+          <NavigationProperty Name="Infos" Relationship="DbModel.ManagerInfo" FromRole="Manager" ToRole="Info" />
+        </EntityType>
+        <EntityType Name="Info">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Date" Type="DateTime" Nullable="false" />
+          <Property Name="ClientName" Type="String" Nullable="false" />
+          <Property Name="Item" Type="String" Nullable="false" />
+          <Property Name="Sum" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Manager" Relationship="DbModel.ManagerInfo" FromRole="Info" ToRole="Manager" />
+          <Property Name="ManagerId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="ManagerInfo">
+          <End Type="DbModel.Manager" Role="Manager" Multiplicity="1" />
+          <End Type="DbModel.Info" Role="Info" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Manager">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Info">
+              <PropertyRef Name="ManagerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
-        <Alias Key="Model" Value="DbModel" />
-        <Alias Key="Target" Value="DbModel.Store" />
-        <EntityContainerMapping CdmEntityContainer="DbModelContainer" StorageEntityContainer="DbModelTargetContainer">
-        </EntityContainerMapping>
-      </Mapping>
-    </edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="DbModelStoreContainer" CdmEntityContainer="DbModelContainer">
+    <EntitySetMapping Name="ManagerSet">
+      <EntityTypeMapping TypeName="IsTypeOf(DbModel.Manager)">
+        <MappingFragment StoreEntitySet="ManagerSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="ManagerName" ColumnName="ManagerName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="InfoSet">
+      <EntityTypeMapping TypeName="IsTypeOf(DbModel.Info)">
+        <MappingFragment StoreEntitySet="InfoSet">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+          <ScalarProperty Name="Item" ColumnName="Item" />
+          <ScalarProperty Name="Sum" ColumnName="Sum" />
+          <ScalarProperty Name="ManagerId" ColumnName="ManagerId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
@@ -36,8 +126,9 @@
     <edmx:Options>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="ValidateOnBuild" Value="true" />
-        <DesignerProperty Name="EnablePluralization" Value="False" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
         <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="True" />
       </DesignerInfoPropertySet>
     </edmx:Options>
     <!-- Diagram content (shape and connector positions) -->

@@ -25,5 +25,7 @@ namespace DataAccessLayer
             throw new UnintentionalCodeFirstException();
         }
     
+        public DbSet<Manager> ManagerSet { get; set; }
+        public DbSet<Info> InfoSet { get; set; }
     }
 }

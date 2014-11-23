@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="DbModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2008" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="DbModelStoreContainer">
+    <EntitySet Name="ManagerSet" EntityType="DbModel.Store.ManagerSet" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="InfoSet" EntityType="DbModel.Store.InfoSet" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="ManagerInfo" Association="DbModel.Store.ManagerInfo">
+      <End Role="Manager" EntitySet="ManagerSet" />
+      <End Role="Info" EntitySet="InfoSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="ManagerSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ManagerName" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="InfoSet">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="ClientName" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Item" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Sum" Type="int" Nullable="false" />
+    <Property Name="ManagerId" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="ManagerInfo">
+    <End Role="Manager" Type="DbModel.Store.ManagerSet" Multiplicity="1" />
+    <End Role="Info" Type="DbModel.Store.InfoSet" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Manager">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Info">
+        <PropertyRef Name="ManagerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

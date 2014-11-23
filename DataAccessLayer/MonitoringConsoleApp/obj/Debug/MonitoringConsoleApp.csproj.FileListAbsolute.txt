@@ -1,0 +1,12 @@
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\obj\Debug\MonitoringConsoleApp.csprojResolveAssemblyReference.cache
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\MonitoringConsoleApp.exe.config
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\MonitoringConsoleApp.exe
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\MonitoringConsoleApp.pdb
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\DataAccessLayer.dll
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.dll
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\DataAccessLayer.pdb
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.xml
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\obj\Debug\MonitoringConsoleApp.exe
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\obj\Debug\MonitoringConsoleApp.pdb
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.SqlServer.dll
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.SqlServer.xml

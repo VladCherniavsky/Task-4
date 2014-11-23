@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="DbModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+  <EntityContainer Name="DbModelContainer" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="ManagerSet" EntityType="DbModel.Manager" />
+    <EntitySet Name="InfoSet" EntityType="DbModel.Info" />
+    <AssociationSet Name="ManagerInfo" Association="DbModel.ManagerInfo">
+      <End Role="Manager" EntitySet="ManagerSet" />
+      <End Role="Info" EntitySet="InfoSet" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Manager">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ManagerName" Type="String" Nullable="false" />
+    <NavigationProperty Name="Infos" Relationship="DbModel.ManagerInfo" FromRole="Manager" ToRole="Info" />
+  </EntityType>
+  <EntityType Name="Info">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Date" Type="DateTime" Nullable="false" />
+    <Property Name="ClientName" Type="String" Nullable="false" />
+    <Property Name="Item" Type="String" Nullable="false" />
+    <Property Name="Sum" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Manager" Relationship="DbModel.ManagerInfo" FromRole="Info" ToRole="Manager" />
+    <Property Name="ManagerId" Type="Int32" Nullable="false" />
+  </EntityType>
+  <Association Name="ManagerInfo">
+    <End Type="DbModel.Manager" Role="Manager" Multiplicity="1" />
+    <End Type="DbModel.Info" Role="Info" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Manager">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Info">
+        <PropertyRef Name="ManagerId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
