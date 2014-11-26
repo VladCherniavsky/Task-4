@@ -77,9 +77,11 @@ namespace MonitoringService
             
             FileSystemWatcher watcher = new FileSystemWatcher(pathes, "*.csv");
             watcher.EnableRaisingEvents = true;
-            watcher.Created += new FileSystemEventHandler(OnCreated);
+            
             watcher.Created += GetFiles(listOfpathes, pathes);
             watcher.Created += SaveDataForAdding(listOfpathes, dataForAdding);
+            watcher.Created += new FileSystemEventHandler(OnCreated);
+            watcher.Created += AddDataToDatabase(dataForAdding);
         }
 
         protected override void OnStop()
@@ -101,6 +103,7 @@ namespace MonitoringService
             return null;
 
         }
+
         public static FileSystemEventHandler SaveDataForAdding(List<string> listOfpathes, Dictionary<FileName, Object> dataForAdding)
         {
             foreach (var nameOfFile in listOfpathes)
@@ -141,33 +144,18 @@ namespace MonitoringService
                 dataForAdding.Add(nameAndDate, setOfHoldContentOfFile);
             }
             return null;
-
         }
-        public static FileSystemEventHandler ParsingDocument(IEnumerable<string> filesName, List<DocumentContent> holdContentOfFile, List<Object> list)
-        {
-            foreach (var path in filesName)
-            {
-                using (var streamReader = new StreamReader(path))
-                {
-                    while (!streamReader.EndOfStream)
-                    {
-                        string line = streamReader.ReadLine();
-                        if (line != null)
-                        {
-                            string[] separatedContent = line.Split(',');
-                            DocumentContent documentContent = new DocumentContent(
-                                separatedContent[0].Trim(),
-                                separatedContent[1].Trim(),
-                                separatedContent[2].Trim(),
-                                separatedContent[3].Trim());
-                            holdContentOfFile.Add(documentContent);
-                        }
-                    }
-                    list.Add(holdContentOfFile);
-                }
 
+        public FileSystemEventHandler AddDataToDatabase(Dictionary<FileName, Object> dataForAdding)
+        {
+            DbModelContainer db = new DbModelContainer();
+            foreach (var data in dataForAdding)
+            {
+                db.ManagerSet.Add(new Manager(){Id = 1, ManagerName = data.Key.SecondNameInFileName});
+                var item = data.Value;
             }
             return null;
         }
+
     }
 }
