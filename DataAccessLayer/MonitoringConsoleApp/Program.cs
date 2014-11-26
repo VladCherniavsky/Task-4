@@ -43,7 +43,7 @@ namespace MonitoringConsoleApp
             return null;
         }
 
-        public static FileSystemEventHandler ParsingDocument(IEnumerable<string> filesName, List<DocumentContent> holdContentOfFile )
+        public static FileSystemEventHandler ParsingDocument(IEnumerable<string> filesName, List<DocumentContent> holdContentOfFile)
         {
             foreach (var path in filesName)
             {
@@ -63,6 +63,7 @@ namespace MonitoringConsoleApp
                             holdContentOfFile.Add(documentContent);
                         }
                     }
+                    
                 }
                 
             }

@@ -10,3 +10,7 @@ D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringServic
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringService.pdb
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\EntityFramework.SqlServer.dll
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\EntityFramework.SqlServer.xml
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringService.MyWindowsServiceInstaller.resources
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringService.csproj.GenerateResource.Cache
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\MonitoringConsoleApp.exe
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\MonitoringConsoleApp.pdb
