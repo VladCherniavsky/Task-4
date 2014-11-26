@@ -56,7 +56,7 @@ namespace MonitoringConsoleApp
                         {
                             string[] separatedContent = line.Split(',');
                             DocumentContent documentContent = new DocumentContent(
-                                separatedContent[0].Trim(), 
+                                separatedContent[0].Trim(),
                                 separatedContent[1].Trim(),
                                 separatedContent[2].Trim(),
                                 separatedContent[3].Trim());

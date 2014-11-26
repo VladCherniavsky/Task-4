@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -73,15 +74,16 @@ namespace MonitoringService
             const string pathes = "C:\\Users\\Влад\\Desktop\\Files";
             List<string> listOfpathes= new List<string>();
             List<FileName> namesOfFlies = new List<FileName>();
+            List<List<DocumentContent>> setOfDocs = new List<List<DocumentContent>>();
 
             
             FileSystemWatcher watcher = new FileSystemWatcher(pathes, "*.csv");
             watcher.EnableRaisingEvents = true;
             
             watcher.Created += GetFiles(listOfpathes, pathes);
-            watcher.Created += SaveDataForAdding(listOfpathes, dataForAdding);
+            watcher.Created += SaveDataForAdding(listOfpathes,namesOfFlies,setOfDocs);
             watcher.Created += new FileSystemEventHandler(OnCreated);
-            watcher.Created += AddDataToDatabase(dataForAdding);
+            watcher.Created += AddDataToDatabase(namesOfFlies, setOfDocs);
         }
 
         protected override void OnStop()
@@ -104,11 +106,12 @@ namespace MonitoringService
 
         }
 
-        public static FileSystemEventHandler SaveDataForAdding(List<string> listOfpathes, Dictionary<FileName, Object> dataForAdding)
+        public static FileSystemEventHandler SaveDataForAdding(List<string> listOfpathes,
+            List<FileName> namesOfFlies, List<List<DocumentContent>> contentList)
         {
             foreach (var nameOfFile in listOfpathes)
             {
-                List<DocumentContent> holdContentOfFile = new List<DocumentContent>();
+                List<DocumentContent> holdAllStringsOfFile = new List<DocumentContent>();
                 string fileName = Path.GetFileNameWithoutExtension(nameOfFile);
                 Regex re = new Regex(@"([a-zA-Z]+)");
                 Regex re1 = new Regex(@"(\d+)");
@@ -119,9 +122,9 @@ namespace MonitoringService
                 int numberPart = Convert.ToInt32((result1.Groups[1].Value));
                 var separatedNumberPart = numberPart.ToString(("##\\.##\\.####"));
                 FileName nameAndDate = new FileName(alphaPart, separatedNumberPart);
-              // namesOfFlies.Add(nameAndDate);
+              namesOfFlies.Add(nameAndDate);
 
-                List<Object> setOfHoldContentOfFile = new List<object>();
+                //List<Object> setOfHoldContentOfFile = new List<object>();
                 using (var streamReader = new StreamReader(nameOfFile))
                 {
                     while (!streamReader.EndOfStream)
@@ -135,27 +138,49 @@ namespace MonitoringService
                                 separatedContent[1].Trim(),
                                 separatedContent[2].Trim(),
                                 separatedContent[3].Trim());
-                            holdContentOfFile.Add(documentContent);
+                            holdAllStringsOfFile.Add(documentContent);
                         }
                     }
                 }
 
-                setOfHoldContentOfFile.Add(holdContentOfFile);
-                dataForAdding.Add(nameAndDate, setOfHoldContentOfFile);
+                contentList.Add(holdAllStringsOfFile);
+                
             }
             return null;
         }
 
-        public FileSystemEventHandler AddDataToDatabase(Dictionary<FileName, Object> dataForAdding)
+        public FileSystemEventHandler AddDataToDatabase(List<FileName> namesOfFlies,List<List<DocumentContent>> setOfDocs)
         {
             DbModelContainer db = new DbModelContainer();
-            foreach (var data in dataForAdding)
+            foreach (var fileName in namesOfFlies)
             {
-                db.ManagerSet.Add(new Manager(){Id = 1, ManagerName = data.Key.SecondNameInFileName});
-                var item = data.Value;
+                Manager manager = new Manager();
+                manager.ManagerName = fileName.SecondNameInFileName;
+                db.ManagerSet.Add(manager);
+
+                foreach (var oneDoc in setOfDocs)
+                {
+                    foreach (var oneLine in oneDoc)
+                    {
+                        DocumentContent documentContent = new DocumentContent(
+                            oneLine.DateContentInFile,
+                            oneLine.ClientName,
+                            oneLine.Item,
+                            oneLine.Sum);
+
+                            Info infos = new Info();
+
+                            infos.ClientName = documentContent.ClientName;
+                            infos.Date = documentContent.DateContentInFile;
+                            infos.Item = documentContent.Item;
+                            infos.Sum = Convert.ToInt32(documentContent.Sum);
+
+                        db.InfoSet.Add(infos);
+                    }
+                }
+                db.SaveChanges();
             }
             return null;
         }
-
     }
 }

@@ -20,7 +20,10 @@ namespace DataAccessLayer
         {
         }
     
-        
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            throw new UnintentionalCodeFirstException();
+        }
     
         public DbSet<Manager> ManagerSet { get; set; }
         public DbSet<Info> InfoSet { get; set; }
