@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MonitoringConsoleApp
+namespace AppLayer
 {
     public class DocumentContent
     {
@@ -21,12 +17,7 @@ namespace MonitoringConsoleApp
             Item = item;
             Sum = Convert.ToDouble(sum, CultureInfo.InvariantCulture);
         }
-        public DocumentContent(System.DateTime date, string client, string item, double sum)
-        {
-            DateContentInFile = date;
-            ClientName = client;
-            Item = item;
-            Sum = sum;
-        }
+
+
     }
 }

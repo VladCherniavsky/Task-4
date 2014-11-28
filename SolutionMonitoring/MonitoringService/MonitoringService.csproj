@@ -65,6 +65,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DataAccessLayer\AppLayer\AppLayer.csproj">
+      <Project>{6F74C278-2367-45DE-9ADF-370B236C3660}</Project>
+      <Name>AppLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DataAccessLayer\DataAccessLayer\DataAccessLayer.csproj">
       <Project>{f5795f00-ee70-4948-a971-ae42c2e1474d}</Project>
       <Name>DataAccessLayer</Name>

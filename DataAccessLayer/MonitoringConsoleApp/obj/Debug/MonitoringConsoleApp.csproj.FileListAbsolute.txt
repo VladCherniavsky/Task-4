@@ -10,3 +10,5 @@ D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\obj\Debug\MonitoringConsol
 D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\obj\Debug\MonitoringConsoleApp.pdb
 D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.SqlServer.dll
 D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\EntityFramework.SqlServer.xml
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\AppLayer.dll
+D:\GitHub\Task-4\DataAccessLayer\MonitoringConsoleApp\bin\Debug\AppLayer.pdb

@@ -14,3 +14,5 @@ D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringServic
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\obj\Debug\MonitoringService.csproj.GenerateResource.Cache
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\MonitoringConsoleApp.exe
 D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\MonitoringConsoleApp.pdb
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\AppLayer.dll
+D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\AppLayer.pdb

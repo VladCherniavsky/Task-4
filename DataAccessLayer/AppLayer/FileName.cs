@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MonitoringConsoleApp
+﻿namespace AppLayer
 {
     public class FileName
     {
@@ -17,6 +11,6 @@ namespace MonitoringConsoleApp
             DateInFileName = date;
         }
 
-        //List<FileName> _dateAndNameOfFileNames = new List<FileName>();
+        
     }
 }
