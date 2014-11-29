@@ -4,6 +4,10 @@
     {
         public string SecondNameInFileName { get; set; }
         public string DateInFileName { get; set; }
+        public FileName()
+        {
+            
+        }
 
         public FileName(string name, string date)
         {
