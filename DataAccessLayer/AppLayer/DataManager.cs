@@ -9,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DataAccessLayer;
+using System.Configuration;
 
 
 namespace AppLayer
@@ -18,28 +19,61 @@ namespace AppLayer
         private TaskFactory _taskFactory;
         private FileSystemWatcher _watcher;
         private Object _lockerForManager;
-        const string SourcePath = "C:\\Users\\Влад\\Desktop\\Files";
+        private static string _sourcePath;
+        public static string PathForProcessedFiles;
+            
+         
         public void Start()
         {
            
             _taskFactory = new TaskFactory();
-
+            Init(null);
             _lockerForManager = new object();
-             string[] sourceFileNames = Directory.GetFiles(SourcePath, "*.csv");
+           
+             string[] sourceFileNames = Directory.GetFiles(_sourcePath, "*.csv");
             foreach (var fileName in sourceFileNames)
             {
                 ProcessFileAsync(fileName);
             }
 
-            _watcher = new FileSystemWatcher(SourcePath, "*.csv");
+            _watcher = new FileSystemWatcher(_sourcePath, "*.csv");
             _watcher.Created += CreateFileHandler;
             _watcher.EnableRaisingEvents = true;
+        }
+
+        public static void Init(string path)
+        {
+            if (path != null)
+            {
+                _sourcePath = path;
+            }
+            else
+            {
+                //System.Configuration.ConfigurationManager.AppSettings["CatalogName"]
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+                _sourcePath = settings["CatalogName"].Value;
+                PathForProcessedFiles = @"D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\ProcessedFiles";
+            }
+        }
+
+        public static void MoveFiles(string fileName)
+        {
+            string sourceFile = Path.Combine(_sourcePath, fileName);
+            string destinationFile = Path.Combine(PathForProcessedFiles, Path.GetFileName(fileName));
+
+            if (!Directory.Exists(PathForProcessedFiles))
+            {
+                if (PathForProcessedFiles != null) Directory.CreateDirectory(PathForProcessedFiles);
+            }
+
+            File.Move(sourceFile, destinationFile);
         }
 
         public void ProcessFileAsync(string fileName)
         {
             
-            CreateFileHandler(this, new FileSystemEventArgs(WatcherChangeTypes.All, SourcePath, Path.GetFileName(fileName)));
+            CreateFileHandler(this, new FileSystemEventArgs(WatcherChangeTypes.All, _sourcePath, Path.GetFileName(fileName)));
         }
 
         public void ProcessFile(string fileName)
@@ -50,6 +84,7 @@ namespace AppLayer
             {
                 AddInfo(streamReader, manager);
             }
+            MoveFiles(fileName);
         }
 
         public void CreateFileHandler(object sender, FileSystemEventArgs e)
