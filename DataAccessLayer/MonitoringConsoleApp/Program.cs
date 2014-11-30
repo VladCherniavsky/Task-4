@@ -18,6 +18,7 @@ namespace MonitoringConsoleApp
         {
             DataManager manager = new DataManager();
             manager.Start();
+            Console.ReadKey();
         }
     }
 }

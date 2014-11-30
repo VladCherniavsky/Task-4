@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,80 +16,114 @@ namespace AppLayer
     public class DataManager: IDisposable
     {
         private TaskFactory _taskFactory;
-
+        private FileSystemWatcher _watcher;
+        private Object _lockerForManager;
+        const string SourcePath = "C:\\Users\\Влад\\Desktop\\Files";
         public void Start()
         {
-            const string pathes = "C:\\Users\\Влад\\Desktop\\Files";
+           
             _taskFactory = new TaskFactory();
-            FileSystemWatcher watcher = new FileSystemWatcher(pathes, "*.csv");
-            watcher.EnableRaisingEvents = true;
 
-            watcher.Created += CreateFileHandler;
+            _lockerForManager = new object();
+             string[] sourceFileNames = Directory.GetFiles(SourcePath, "*.csv");
+            foreach (var fileName in sourceFileNames)
+            {
+                ProcessFileAsync(fileName);
+            }
+
+            _watcher = new FileSystemWatcher(SourcePath, "*.csv");
+            _watcher.Created += CreateFileHandler;
+            _watcher.EnableRaisingEvents = true;
         }
+
+        public void ProcessFileAsync(string fileName)
+        {
+            
+            CreateFileHandler(this, new FileSystemEventArgs(WatcherChangeTypes.All, SourcePath, Path.GetFileName(fileName)));
+        }
+
+        public void ProcessFile(string fileName)
+        {
+            string managerName = ProcessFileName(fileName);
+            Manager manager = GetOrCreateManager(managerName);
+            using (var streamReader = new StreamReader(fileName))
+            {
+                AddInfo(streamReader, manager);
+            }
+        }
+
         public void CreateFileHandler(object sender, FileSystemEventArgs e)
         {
-            _taskFactory.StartNew((object fileName) =>
-            {
-                FileName namesOfFile;
-                List<DocumentContent> listOfstrings;
-                ProcessFile(fileName as string, out  namesOfFile, out listOfstrings);
-                AddToDb( namesOfFile, listOfstrings);
-            }, e.FullPath);
+            _taskFactory.StartNew((object fileName) => ProcessFile(fileName as String), e.FullPath);
         }
 
-        public void ProcessFile(string fileName, out FileName namesOfFile, out List<DocumentContent> listOfstrings)
+        
+        protected Manager GetOrCreateManager(string managerName)
         {
-            namesOfFile = new FileName();  
-            listOfstrings = new List<DocumentContent>();
-            string  separatedfileName = Path.GetFileNameWithoutExtension(fileName);
+            Manager m = null;
+            using (DbModelContainer dcModel = new DbModelContainer())
+            {
+                lock (_lockerForManager)
+                {
+                     m = dcModel.ManagerSet.FirstOrDefault(x => x.ManagerName == managerName);
+                    if (m == null)
+                    {
+                        m = new Manager(){ManagerName = managerName};
+                        dcModel.ManagerSet.Add(m);
+                        dcModel.SaveChanges();
+                    }
+                }
+            }
+            return m;
+        }
+
+        public string ProcessFileName(string fileName)
+        {
+            
+            string separatedfileName = Path.GetFileNameWithoutExtension(fileName);
             Regex re = new Regex(@"([a-zA-Z]+)");
             Regex re1 = new Regex(@"(\d+)");
 
             Match result = re.Match(separatedfileName);
-            Match result1 = re1.Match(separatedfileName);
             string alphaPart = result.Groups[1].Value;
-            int numberPart = Convert.ToInt32((result1.Groups[1].Value));
-            var separatedNumberPart = numberPart.ToString(("##\\.##\\.####"));
-            FileName nameAndDate = new FileName(alphaPart, separatedNumberPart);
-            namesOfFile = nameAndDate;
+            return alphaPart;
+        }
 
-            
-            using (var streamReader = new StreamReader(fileName))
+        protected void AddInfo(StreamReader streamReader, Manager manager)
+        {
+            using (var dbModelContainer = new DbModelContainer())
             {
+               
+                dbModelContainer.ManagerSet.Attach(manager);
                 while (!streamReader.EndOfStream)
                 {
                     string line = streamReader.ReadLine();
                     if (line != null)
                     {
-                        string[] separatedContent = line.Split(',');
-                        DocumentContent documentContent = new DocumentContent(
-                            separatedContent[0].Trim(),
-                            separatedContent[1].Trim(),
-                            separatedContent[2].Trim(),
-                            separatedContent[3].Trim());
-                        listOfstrings.Add(documentContent);
+                        string[] separatedContent = line.Split(',').Select(x=>x.Trim()).ToArray();
+                        dbModelContainer.InfoSet.Add(new Info()
+                        {
+                            
+                            Date = DateTime.ParseExact(separatedContent[0], "MM.dd.yyyy", CultureInfo.InvariantCulture),
+                            ClientName = separatedContent[1],
+                            Item = separatedContent[2],
+                            Sum = Convert.ToInt32(separatedContent[3], CultureInfo.InvariantCulture),
+                            Manager = manager
+                        });
                     }
                 }
+                dbModelContainer.SaveChanges();
             }
         }
 
-        public void AddToDb( FileName namesOfFile, List<DocumentContent> listOfstrings)
+        public void Stop()
         {
-            DbModelContainer db = new DbModelContainer();
-          
-            db.ManagerSet.Add(new Manager() {ManagerName = namesOfFile.SecondNameInFileName});
-
-            listOfstrings.ToList().ForEach(x => db.InfoSet.Add(new Info()
-            {
-                ClientName = x.ClientName,
-                Date = x.DateContentInFile,
-                Item = x.Item,
-                Sum = Convert.ToInt32(x.Sum)
-            }));
-            db.SaveChanges();
+            _watcher.Dispose();
+            _watcher = null;
+            _taskFactory = null;
+           // _lockerForManager = null;
         }
-        
-        
+
         public void Dispose()
         {
             throw new NotImplementedException();
