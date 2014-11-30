@@ -14,10 +14,10 @@ namespace MonitoringService
         /// </summary>
         static void Main()
         {
-#if DEBUG
-            Service1 myService1 = new Service1();
-            myService1.OnDebug();
-#else
+//#if DEBUG
+//            Service1 myService1 = new Service1();
+//            myService1.OnDebug();
+//#else
 
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[] 
@@ -25,7 +25,7 @@ namespace MonitoringService
                 new Service1() 
             };
             ServiceBase.Run(ServicesToRun);
-#endif
+//#endif
         }
     }
 }

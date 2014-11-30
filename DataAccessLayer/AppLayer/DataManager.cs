@@ -20,14 +20,14 @@ namespace AppLayer
         private FileSystemWatcher _watcher;
         private Object _lockerForManager;
         private static string _sourcePath;
-        public static string PathForProcessedFiles;
-            
+        private static string _pathForProcessedFiles;
+             
          
         public void Start()
         {
            
             _taskFactory = new TaskFactory();
-            Init(null);
+            Init(null, null);
             _lockerForManager = new object();
            
              string[] sourceFileNames = Directory.GetFiles(_sourcePath, "*.csv");
@@ -41,33 +41,46 @@ namespace AppLayer
             _watcher.EnableRaisingEvents = true;
         }
 
-        public static void Init(string path)
+        public static void Init(string path, string pathForProcessedFiles)
         {
-            if (path != null)
+            if (path != null && pathForProcessedFiles!=null)
             {
                 _sourcePath = path;
+                _pathForProcessedFiles = pathForProcessedFiles;
             }
             else
             {
                 //System.Configuration.ConfigurationManager.AppSettings["CatalogName"]
                 var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
                 var settings = configFile.AppSettings.Settings;
-                _sourcePath = settings["CatalogName"].Value;
-                PathForProcessedFiles = @"D:\GitHub\Task-4\SolutionMonitoring\MonitoringService\bin\Debug\ProcessedFiles";
+               _sourcePath = settings["CatalogName"].Value;
+               _pathForProcessedFiles = _sourcePath + @"\ProcessedFiles";
             }
         }
 
         public static void MoveFiles(string fileName)
         {
             string sourceFile = Path.Combine(_sourcePath, fileName);
-            string destinationFile = Path.Combine(PathForProcessedFiles, Path.GetFileName(fileName));
+            string destinationFile = Path.Combine(_pathForProcessedFiles, Path.GetFileName(fileName));
+            
 
-            if (!Directory.Exists(PathForProcessedFiles))
+            if (!Directory.Exists(_pathForProcessedFiles))
             {
-                if (PathForProcessedFiles != null) Directory.CreateDirectory(PathForProcessedFiles);
+                Directory.CreateDirectory(_pathForProcessedFiles);
+                
             }
 
-            File.Move(sourceFile, destinationFile);
+            List<string> arrayOfProcessedFiles = Directory.GetFiles(_pathForProcessedFiles).ToList();
+
+            if (!arrayOfProcessedFiles.Contains(destinationFile))
+            {
+                File.Move(sourceFile, destinationFile);
+            }
+            else
+            {
+                File.Delete(sourceFile);
+            }
+
         }
 
         public void ProcessFileAsync(string fileName)
@@ -136,15 +149,24 @@ namespace AppLayer
                     if (line != null)
                     {
                         string[] separatedContent = line.Split(',').Select(x=>x.Trim()).ToArray();
-                        dbModelContainer.InfoSet.Add(new Info()
+                        try
                         {
-                            
-                            Date = DateTime.ParseExact(separatedContent[0], "MM.dd.yyyy", CultureInfo.InvariantCulture),
-                            ClientName = separatedContent[1],
-                            Item = separatedContent[2],
-                            Sum = Convert.ToInt32(separatedContent[3], CultureInfo.InvariantCulture),
-                            Manager = manager
-                        });
+                            dbModelContainer.InfoSet.Add(new Info()
+                            {
+
+                                Date =
+                                    DateTime.ParseExact(separatedContent[0], "MM.dd.yyyy", CultureInfo.InvariantCulture),
+                                ClientName = separatedContent[1],
+                                Item = separatedContent[2],
+                                Sum = Convert.ToInt32(separatedContent[3], CultureInfo.InvariantCulture),
+                                Manager = manager
+                            });
+                        }
+                        catch (System.FormatException e)
+                        {
+                            throw new Exception("The order of items  is  incorrect!");
+                        }
+
                     }
                 }
                 dbModelContainer.SaveChanges();

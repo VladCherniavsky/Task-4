@@ -63,10 +63,10 @@ namespace MonitoringService
             InitializeComponent();
         }
 
-        public void OnDebug()
-        {
-            OnStart(null);
-        }
+        //public void OnDebug()
+        //{
+        //    OnStart(null);
+        //}
 
 
 
